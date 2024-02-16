@@ -62,8 +62,8 @@ routes.post('/agendamentos', (req, res) => {
     });
 });
 
-// routes.get('/', (req, res) => {
-//   res.send('Hello World4');
-// });
+routes.get('/', (req, res) => {
+  res.send('Hello World4');
+});
 
 module.exports = routes; 
