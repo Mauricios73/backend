@@ -62,8 +62,8 @@ routes.post('/agendamentos', (req, res) => {
     });
 });
 
-routes.get('/', (req, res) => {
-  res.send('Hello World4');
+routes.get('/teste', (req, res) => {
+  res.send('Esta é uma rota de teste');
 });
 
 module.exports = routes; 
