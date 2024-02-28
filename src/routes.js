@@ -62,7 +62,7 @@ routes.post('/agendamentos', (req, res) => {
     });
 });
 
-routes.get('/teste', (req, res) => {
+routes.get('/', (req, res) => {
   res.send('Esta é uma rota de teste');
 });
 
