@@ -2,8 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routes = express.Router();
-
-// app.use(bodyParser.json());
+const bcrypt = require('bcryptjs');
 
 //________________LOGIN__________________
 
@@ -17,15 +16,19 @@ const User = mongoose.model('User', userSchema);
 
 routes.post('/users', async (req, res) => {
   const { email, password } = req.body;
-  
-  try {
-    // const user = users.find(user => user.email === email && user.password === password);
-    const user = await User.findOne({ email, password });
 
+  try {
+    const user = await User.findOne({ email });
     if (user) {
-      return res.status(200).json(user);
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (passwordMatch) {
+        return res.status(200).json(user);
+      } else {
+        return res.status(401).json({ message: 'Senha incorreta!' });
+      }
     }
-    return res.status(401).json({ message: 'Credenciais inválidas' });
+
+    return res.status(401).json({ message: 'Credenciais inválidas2' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Erro interno do servidor' });
@@ -62,8 +65,41 @@ routes.post('/agendamentos', (req, res) => {
     });
 });
 
+//______________Rota de teste______________
+
 routes.get('/', (req, res) => {
-  res.send('Esta é uma rota de teste');
+  res.send(
+    `<h1>Bem vindo ao meu site!</h1>
+    <p>Aqui você pode agendar uma consulta com um de nossos especialistas.</p>
+
+    <p>Para agendar uma consulta, basta preencher o formulário abaixo.</p>`
+  );
+});
+
+//______________SingUp______________
+
+
+routes.post('/newusers', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    // Verifica se o email já está em uso
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email já cadastrado!' });
+    }
+
+    // Hash da senha
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Criação do usuário
+    const newUser = await User.create({ name, email, password: hashedPassword });
+
+    return res.status(201).json(newUser); 
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
 });
 
 module.exports = routes; 
